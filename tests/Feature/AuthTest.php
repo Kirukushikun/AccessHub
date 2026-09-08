@@ -71,4 +71,28 @@ class AuthTest extends TestCase
 
         $this->assertTrue($user->fresh()->active);
     }
+
+    public function test_admin_can_change_their_own_password(): void
+    {
+        $user = User::factory()->create(['password' => Hash::make('old-password-1')]);
+
+        $this->actingAs($user)->put('/account/password', [
+            'current_password' => 'old-password-1',
+            'password' => 'brand-new-password-2',
+            'password_confirmation' => 'brand-new-password-2',
+        ])->assertSessionHasNoErrors();
+
+        $this->assertTrue(Hash::check('brand-new-password-2', $user->fresh()->password));
+    }
+
+    public function test_password_change_requires_the_correct_current_password(): void
+    {
+        $user = User::factory()->create(['password' => Hash::make('old-password-1')]);
+
+        $this->actingAs($user)->put('/account/password', [
+            'current_password' => 'wrong',
+            'password' => 'brand-new-password-2',
+            'password_confirmation' => 'brand-new-password-2',
+        ])->assertSessionHasErrors('current_password');
+    }
 }

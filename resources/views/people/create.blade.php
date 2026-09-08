@@ -36,8 +36,8 @@
                     <div class="p-4">
                         <x-empty title="Directory unavailable" :message="$directoryError" />
                         <p class="mt-3 text-center text-xs text-gray-400">
-                            Set <code>USER_API_ENDPOINT</code> and <code>USER_API_KEY</code>, then check
-                            <a href="{{ route('debug.user-api') }}" class="underline">/debug/user-api</a>.
+                            Check <code>USER_API_ENDPOINT</code> / <code>USER_API_KEY</code> and run
+                            <code>php artisan hub:check</code> on the server.
                         </p>
                     </div>
                 @else

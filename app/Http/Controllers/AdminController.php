@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
 class AdminController extends Controller
@@ -66,5 +67,24 @@ class AdminController extends Controller
         }
 
         return back()->with('success', "{$user->name} updated.");
+    }
+
+    public function account(): View
+    {
+        return view('admins.account');
+    }
+
+    public function updatePassword(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'current_password' => ['required', 'current_password'],
+            'password' => ['required', 'confirmed', Password::defaults()],
+        ]);
+
+        $request->user()->update(['password' => Hash::make($request->input('password'))]);
+
+        Audit::record('admin.password_changed', $request->user()->email, $request->user());
+
+        return back()->with('success', 'Password updated.');
     }
 }

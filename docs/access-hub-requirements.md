@@ -252,9 +252,13 @@ Consumer rules:
 - `created_at` can be null; don't format it blindly.
 - Decrypt the ID with `Crypt::decryptString($user['id'])` before any DB work. Wrap each record in try/catch and skip on failure — a foreign `APP_KEY` throws per-record.
 
-### Debug route first
+### Verifying the decrypt
 
-Before writing any consumer code, stand up a temporary admin-gated, non-production route that dumps the raw response plus a decrypt check of the first record's ID. An `APP_KEY` mismatch is silent — every record just gets skipped — and this surfaces it in one request. Delete the route before go-live.
+`php artisan hub:check` calls the directory, decrypts the ids with this server's
+`APP_KEY`, and prints a sample person — plus env/admin/cacert checks. Run it after every
+deploy. An `APP_KEY` mismatch is otherwise silent: every record is skipped and the people
+list looks empty. (During build this started as a temporary `/debug/user-api` web route;
+that route was removed once the consumer code was proven — the command replaces it.)
 
 ### `APP_KEY` must match the directory system
 
@@ -262,7 +266,7 @@ The encrypted IDs are encrypted with the directory / auth system's `APP_KEY`. Th
 
 - Deploy the hub with the **byte-identical** `APP_KEY` (the full `base64:...` value) used by the directory system, per environment.
 - **Do not run `php artisan key:generate`** on the hub after deploy. It breaks directory sync and nothing else, so it fails silently in the same way — an empty people list, no error.
-- The debug-route-first check above is the guardrail: confirm record #1 decrypts before building anything on top.
+- `php artisan hub:check` is the guardrail: run it on every server after deploy — it confirms records decrypt with that server's `APP_KEY` and prints a sample person.
 - Sharing the key also means the hub *could* forge an app-to-app login into any other system. The hub never participates in login, so it never uses this — but do not add anything that would. See [§9](#9-security); fixing the shared-key problem is explicitly out of scope here.
 
 If you fake this API in tests, build the fixture from a **pasted real response**, not from this document.
@@ -316,7 +320,7 @@ Build the **project side first** against a hand-written fake response (see the i
 ## 12. Checklist
 
 - [x] Four tables: `people`, `projects`, `person_project`, `connections`, plus `audit_log` (+ `connection_codes`, `access_logs`)
-- [x] Directory API integration — `DirectoryClient` + `/debug/user-api` route (real client; "Add person" degrades cleanly when `USER_API_ENDPOINT` unset)
+- [x] Directory API integration — `DirectoryClient` + `php artisan hub:check` verifier (real client; "Add people" degrades cleanly when `USER_API_ENDPOINT` unset)
 - [x] `APP_KEY` deployed identical to the directory system per environment; `key:generate` not run post-deploy
 - [x] Project registration with `acceptance` setting
 - [x] Person management with fixed role list (multi-select — a person can hold more than one) and `scope` setting
@@ -328,7 +332,8 @@ Build the **project side first** against a hand-written fake response (see the i
 - [x] Connections screen — grouped by project and environment, revoke and regenerate
 - [x] Audit log on every mutating action (`App\Support\Audit`)
 - [x] Admin-only access, self-revoke blocked. **Login is built-in Laravel auth** (email + password against `users`), not the external Auth API — Turnstile is wired but off unless `TURNSTILE_VERIFY=true`. 3-strikes/15-min lockout + `access_logs`.
-- [x] Break-glass account — `AdminSeeder` from `BREAKGLASS_ADMIN_*`; document the credentials offline
+- [x] Break-glass account — `AdminSeeder` from `BREAKGLASS_ADMIN_*` (one admin; in-app password change at `/account`); document the credentials offline
+- [x] Deployment ready — `docs/DEPLOYMENT.md`, `php artisan hub:check`, HTTPS-forced + proxy-trusted in production, login throttled, `.env.example` is a production template
 
 ### Not built (deferred)
 

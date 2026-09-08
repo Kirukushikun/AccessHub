@@ -16,6 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
         apiPrefix: 'api',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Behind the server's reverse proxy — trust its forwarded headers so
+        // HTTPS detection and request IPs (audit log, login lockout) are correct.
+        $middleware->trustProxies(at: '*');
+
         $middleware->alias([
             'admin' => EnsureActiveAdmin::class,
             'connection.auth' => AuthenticateConnection::class,

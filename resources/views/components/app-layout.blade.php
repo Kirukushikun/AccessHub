@@ -36,11 +36,15 @@
 
         <div class="absolute inset-x-0 bottom-0 border-t border-gray-200 p-3">
             @auth
-                <p class="px-3 pb-1 text-xs text-gray-400">{{ auth()->user()->name }}</p>
+                <a href="{{ route('account.edit') }}"
+                   class="block rounded-md px-3 py-2 text-sm {{ request()->routeIs('account.*') ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                    {{ auth()->user()->name }}
+                    <span class="block text-xs {{ request()->routeIs('account.*') ? 'text-gray-300' : 'text-gray-400' }}">Account &amp; password</span>
+                </a>
             @endauth
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button class="w-full rounded-md px-3 py-2 text-left text-sm text-gray-600 hover:bg-gray-100">
+                <button class="mt-1 w-full rounded-md px-3 py-2 text-left text-sm text-gray-600 hover:bg-gray-100">
                     Sign out
                 </button>
             </form>
