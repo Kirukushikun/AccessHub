@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\AuthenticateConnection;
 use App\Http\Middleware\EnsureActiveAdmin;
+use App\Http\Middleware\PreferHttps;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -19,6 +20,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // Behind the server's reverse proxy — trust its forwarded headers so
         // HTTPS detection and request IPs (audit log, login lockout) are correct.
         $middleware->trustProxies(at: '*');
+
+        // Pin every production request to https end to end (see the class docblock)
+        // — must run before TrustProxies / StartSession, hence prepend.
+        $middleware->prepend(PreferHttps::class);
 
         $middleware->alias([
             'admin' => EnsureActiveAdmin::class,
