@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Log;
 class DirectoryClient
 {
     /**
-     * @return Collection<int, array{user_id: int, name: string, email: string}>
+     * @return Collection<int, array{user_id: int, name: string, email: string, first_name: string, last_name: string, middle_name: ?string}>
      *
      * @throws DirectoryUnavailable
      */
@@ -59,7 +59,7 @@ class DirectoryClient
             ->values();
     }
 
-    /** @return array{user_id: int, name: string, email: string}|null */
+    /** @return array{user_id: int, name: string, email: string, first_name: string, last_name: string, middle_name: ?string}|null */
     private function normalise(array $row): ?array
     {
         try {
@@ -73,13 +73,17 @@ class DirectoryClient
             return null;
         }
 
-        $name = trim(($row['first_name'] ?? '').' '.($row['last_name'] ?? ''))
-            ?: (string) ($row['name'] ?? '');
+        $first = trim((string) ($row['first_name'] ?? ''));
+        $last = trim((string) ($row['last_name'] ?? ''));
+        $name = trim($first.' '.$last) ?: (string) ($row['name'] ?? '');
 
         return [
             'user_id' => $id,
             'name' => $name,
             'email' => (string) ($row['email'] ?? ''),
+            'first_name' => $first,
+            'last_name' => $last,
+            'middle_name' => trim((string) ($row['middle_name'] ?? '')) ?: null,
         ];
     }
 }

@@ -74,6 +74,25 @@ php artisan db:seed --class=AdminSeeder --force
 env vars are missing, and never overwrites an admin that already exists (safe to
 re-run on redeploy).
 
+## 5a. Load the personnel roster
+
+```sh
+php artisan db:seed --class=PersonnelSeeder --force
+```
+
+Reads `database/data/personnel-directory.md` (the org chart — who is a VP / division
+head / manager / supervisor), matches each name to a directory-API user to get their
+real `user_id`, then **wipes and repopulates** the `people` table — a clean reload, no
+merge. Everyone lands with scope `all`; narrow individuals in the UI afterwards.
+
+Needs the directory API reachable (it aborts, untouched, if not). Re-run it whenever
+the org chart changes — just replace the four tables in that `.md` file first. The run
+prints how many were seeded, any **low-confidence matches** (surname only — eyeball
+them), and anyone **not found in the directory** (add by hand, or fix the spelling in
+the file). It also writes a dated `people.roster_loaded` row to the audit log.
+
+Role mapping: VP → `vp`, Division Head → `division_head`, Manager & Supervisor → `manager`.
+
 ## 6. Cache for production
 
 ```sh
