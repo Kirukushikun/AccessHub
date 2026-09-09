@@ -61,7 +61,7 @@ X-Client-Secret: ...
       "farm": "BFC",
       "department": "Accounting",
       "position": "Senior Accountant",
-      "roles": ["division_head", "requestor"],
+      "roles": ["division_head", "manager"],
       "active": true
     }
   ]
@@ -69,7 +69,7 @@ X-Client-Secret: ...
 ```
 
 `roles` is always an array with **one or more** values from
-`requestor`, `division_head`, `vp`, `user` (config order). A person can hold several roles
+`manager`, `division_head`, `vp`, `user` (config order). A person can hold several roles
 at once; translate each to your local access on your side.
 
 - **Who is included:** the intersection of each person's `scope` and the project's

@@ -3,7 +3,7 @@
 @php
     $labels = \App\Support\AccessHub::roles();
     $colors = [
-        'requestor' => 'blue',
+        'manager' => 'blue',
         'division_head' => 'purple',
         'vp' => 'amber',
         'user' => 'gray',

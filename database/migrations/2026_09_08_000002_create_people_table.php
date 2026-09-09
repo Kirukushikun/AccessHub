@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('farm')->nullable();       // display only — never affects access
             $table->string('department')->nullable(); // display only
             $table->string('position')->nullable();   // job title, display only
-            $table->json('roles');                    // one or more of: requestor | division_head | vp | user
+            $table->json('roles');                    // one or more of: manager | division_head | vp | user
             $table->string('scope')->default('all');  // all | selected
             $table->boolean('active')->default(true); // false on departure, keeps history
             $table->timestamps();

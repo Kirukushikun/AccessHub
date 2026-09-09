@@ -82,7 +82,7 @@ class PeopleTest extends TestCase
 
     public function test_role_filter_matches_any_of_a_persons_roles(): void
     {
-        Person::factory()->roles(['requestor', 'division_head'])->create(['name' => 'Multi']);
+        Person::factory()->roles(['manager', 'division_head'])->create(['name' => 'Multi']);
 
         $this->actingAs($this->admin())->get('/people?role=division_head')
             ->assertOk()->assertSee('Multi');
@@ -93,12 +93,12 @@ class PeopleTest extends TestCase
         $person = Person::factory()->roles('user')->create(['scope' => 'all']);
 
         $this->actingAs($this->admin())->put("/people/{$person->user_id}", [
-            'roles' => ['division_head', 'requestor'],
+            'roles' => ['division_head', 'manager'],
             'scope' => 'all',
             'active' => '1',
         ])->assertRedirect('/people');
 
-        $this->assertEqualsCanonicalizing(['division_head', 'requestor'], $person->fresh()->roles);
+        $this->assertEqualsCanonicalizing(['division_head', 'manager'], $person->fresh()->roles);
         $this->assertSame(1, AuditEntry::where('action', 'person.roles_changed')->count());
     }
 

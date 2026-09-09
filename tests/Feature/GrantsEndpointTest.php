@@ -68,7 +68,7 @@ class GrantsEndpointTest extends TestCase
     public function test_response_has_the_documented_shape(): void
     {
         $project = Project::factory()->create(['acceptance' => 'open']);
-        Person::factory()->roles(['requestor', 'vp'])->create(['scope' => 'all']);
+        Person::factory()->roles(['manager', 'vp'])->create(['scope' => 'all']);
 
         $this->getJson('/api/v1/grants', $this->connect($project))
             ->assertOk()
@@ -76,7 +76,7 @@ class GrantsEndpointTest extends TestCase
                 'generated_at',
                 'people' => [['user_id', 'name', 'email', 'farm', 'department', 'position', 'roles', 'active']],
             ])
-            ->assertJsonPath('people.0.roles', ['requestor', 'vp']);
+            ->assertJsonPath('people.0.roles', ['manager', 'vp']);
     }
 
     public function test_bad_credentials_are_rejected(): void

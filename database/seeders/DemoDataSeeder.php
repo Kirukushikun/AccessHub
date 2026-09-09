@@ -25,16 +25,16 @@ class DemoDataSeeder extends Seeder
         ])->mapWithKeys(fn ($p) => [$p['key'] => Project::create($p)]);
 
         $people = [
-            [412, 'Maria Santos', 'm.santos@example.org', 'BFC', 'Accounting', 'Senior Accountant', ['division_head', 'requestor'], 'all', true, []],
-            [87, 'Juan Cruz', 'j.cruz@example.org', 'PFC', 'Poultry', null, ['requestor'], 'all', true, []],
+            [412, 'Maria Santos', 'm.santos@example.org', 'BFC', 'Accounting', 'Senior Accountant', ['division_head', 'manager'], 'all', true, []],
+            [87, 'Juan Cruz', 'j.cruz@example.org', 'PFC', 'Poultry', null, ['manager'], 'all', true, []],
             [5, 'Elena Rodriguez', 'e.rodriguez@example.org', null, 'Treasury', 'VP Finance', ['vp', 'division_head'], 'selected', true, ['hrms', 'payroll']],
             [233, 'David Lim', 'd.lim@example.org', 'BFC', 'IT and Security Services', 'Systems Administrator', ['user'], 'all', true, []],
-            [198, 'Grace Tan', 'g.tan@example.org', 'BROOKDALE', 'Human Resources', 'HR Manager', ['requestor'], 'all', true, []],
+            [198, 'Grace Tan', 'g.tan@example.org', 'BROOKDALE', 'Human Resources', 'HR Manager', ['manager'], 'all', true, []],
             [341, 'Robert Cruz', 'r.cruz@example.org', 'PFC', 'Swine', 'Farm Supervisor', ['user'], 'all', false, []],
             [76, 'Anna Reyes', 'a.reyes@example.org', null, 'Audit', 'Chief Audit Executive', ['vp'], 'all', true, []],
             [419, 'Michael Ong', 'm.ong@example.org', 'FEEDMILL', 'Feedmill', 'Bookkeeper', ['user'], 'selected', true, ['payroll']],
             [501, 'Sarah Villanueva', 's.villanueva@example.org', 'HATCHERY', 'General Services', 'Admin Officer', ['user'], 'all', true, []],
-            [288, 'Omar Haddad', 'o.haddad@example.org', 'BFC-IRAQ', 'Purchasing', 'Procurement Lead', ['requestor'], 'all', true, []],
+            [288, 'Omar Haddad', 'o.haddad@example.org', 'BFC-IRAQ', 'Purchasing', 'Procurement Lead', ['manager'], 'all', true, []],
             [634, 'Liza Mercado', 'l.mercado@example.org', 'RH/BBGC', 'Sales & Marketing', 'Regional Sales Manager', ['division_head'], 'all', true, []],
         ];
 
@@ -76,7 +76,7 @@ class DemoDataSeeder extends Seeder
         }
 
         $audit = [
-            [now()->subMinutes(8), 'admin_it@bfcgroup.org', 'person.roles_changed', 'Maria Santos: roles now Division head, Requestor'],
+            [now()->subMinutes(8), 'admin_it@bfcgroup.org', 'person.roles_changed', 'Maria Santos: roles now Division head, Manager / supervisor'],
             [now()->subHours(2), 'admin_it@bfcgroup.org', 'connection.code_issued', 'Payroll'],
             [now()->subHours(6), 'admin_it@bfcgroup.org', 'person.scope_changed', 'Michael Ong: all → selected'],
             [now()->subDay(), 'j.delacruz@bfcgroup.org', 'project.registered', 'Inventory Tracker (inventory)'],

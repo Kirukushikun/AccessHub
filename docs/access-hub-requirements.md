@@ -6,7 +6,7 @@ A small central system that holds **who has what org role**, so that every other
 
 ## 1. What this is and is not
 
-**It is:** one list of people and their org role (requestor, division head, VP), plus a way for registered projects to pull that list on demand.
+**It is:** one list of people and their org role (manager, division head, VP), plus a way for registered projects to pull that list on demand.
 
 **It is not:** a login system. Every project keeps using the existing external Auth API exactly as it does today. The hub never sees a password, never issues a session, and is never called during login.
 
@@ -30,17 +30,17 @@ With the hub, the person is stated **once**. Each project pulls them in with one
 
 The hub uses a **fixed, short list** of org roles. Projects do not invent their own role names in the hub.
 
-| Role | Meaning |
-|---|---|
-| `requestor` | Manager / supervisor |
-| `division_head` | Division head |
-| `vp` | Vice president |
-| `user` | Plain user, no elevated access |
+| Role (API key) | Label shown in the hub | Meaning |
+|---|---|---|
+| `manager` | Manager / supervisor | A manager or supervisor |
+| `division_head` | Division head | Division head |
+| `vp` | Vice president | Vice president |
+| `user` | User | Plain user, no elevated access |
 
 Anything unusual (one or two special permissions in a single system) stays a manual entry in that project. Do not try to model those here — that is what keeps the hub small.
 
 A person holds **one or more** of these roles. Most people have exactly one; someone who
-is, say, both a requestor and a division head gets both, and every project receives the
+is, say, both a manager and a division head gets both, and every project receives the
 full set and translates each to its local access. This is still a fixed vocabulary — it is
 not a per-project role list or a permission bundle (see §10). Truly system-specific
 permissions still stay a manual entry in that project.
@@ -180,7 +180,7 @@ Returns a flat list, one entry per person that applies to the calling project:
       "farm": "Farm A",
       "department": "Finance",
       "position": "Senior Accountant",
-      "roles": ["division_head", "requestor"],
+      "roles": ["division_head", "manager"],
       "active": true
     },
     {
@@ -190,7 +190,7 @@ Returns a flat list, one entry per person that applies to the calling project:
       "farm": "Farm B",
       "department": "Operations",
       "position": null,
-      "roles": ["requestor"],
+      "roles": ["manager"],
       "active": true
     }
   ]

@@ -9,8 +9,10 @@ return [
     | Fixed, short lists. Projects do not invent their own role names here.
     */
 
+    // Keys are sent verbatim in the grants API — changing one is a breaking
+    // change for connected projects (run a data migration for existing people rows).
     'roles' => [
-        'requestor' => 'Requestor',
+        'manager' => 'Manager / supervisor',
         'division_head' => 'Division head',
         'vp' => 'Vice president',
         'user' => 'User',
