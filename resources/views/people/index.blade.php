@@ -49,6 +49,9 @@
             <span class="text-gray-400">·</span>
             <button type="button" @click="$dispatch('open-modal', 'bulk-scope')"
                     class="font-medium text-gray-700 hover:underline">Point at project…</button>
+            <span class="text-gray-300">·</span>
+            <button type="button" @click="$dispatch('open-modal', 'bulk-identity')"
+                    class="font-medium text-gray-700 hover:underline">Set farm / department…</button>
             <button type="button" @click="selected = []" class="text-gray-500 hover:text-gray-800">Clear</button>
         </div>
 
@@ -132,6 +135,53 @@
                 </x-field>
                 <div class="flex justify-end gap-2">
                     <x-button type="button" variant="secondary" @click="$dispatch('close-modal', 'bulk-scope')">Cancel</x-button>
+                    <x-button type="submit">Apply</x-button>
+                </div>
+            </form>
+        </x-modal>
+
+        {{-- Bulk identity modal --}}
+        <x-modal name="bulk-identity" title="Set farm / department">
+            <form method="POST" action="{{ route('people.bulk-identity') }}" class="space-y-4">
+                @csrf
+                <template x-for="id in selected" :key="id">
+                    <input type="hidden" name="user_ids[]" :value="id">
+                </template>
+                <p class="text-sm text-gray-500">
+                    Applies to <span x-text="selected.length"></span> people. Tick a field to change it —
+                    leave it unticked to leave that field alone.
+                </p>
+
+                <div x-data="{ on: false }" class="space-y-2 rounded-lg border border-gray-200 p-3">
+                    <label class="flex items-center gap-2 text-sm font-medium text-gray-700">
+                        <input type="checkbox" name="apply_farm" value="1" x-model="on" class="rounded border-gray-300">
+                        Set Farm
+                    </label>
+                    <x-select name="farm" x-bind:disabled="!on" class="disabled:cursor-not-allowed disabled:opacity-50">
+                        <option value="">— Clear —</option>
+                        @foreach ($farms as $farm)
+                            <option value="{{ $farm }}">{{ $farm }}</option>
+                        @endforeach
+                    </x-select>
+                </div>
+
+                <div x-data="{ on: false }" class="space-y-2 rounded-lg border border-gray-200 p-3">
+                    <label class="flex items-center gap-2 text-sm font-medium text-gray-700">
+                        <input type="checkbox" name="apply_department" value="1" x-model="on" class="rounded border-gray-300">
+                        Set Department
+                    </label>
+                    <x-select name="department" x-bind:disabled="!on" class="disabled:cursor-not-allowed disabled:opacity-50">
+                        <option value="">— Clear —</option>
+                        @foreach ($departments as $dept)
+                            <option value="{{ $dept }}">{{ $dept }}</option>
+                        @endforeach
+                    </x-select>
+                </div>
+
+                @error('farm') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
+
+                <div class="flex justify-end gap-2">
+                    <x-button type="button" variant="secondary" @click="$dispatch('close-modal', 'bulk-identity')">Cancel</x-button>
                     <x-button type="submit">Apply</x-button>
                 </div>
             </form>

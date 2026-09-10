@@ -122,4 +122,46 @@ class PeopleTest extends TestCase
     {
         $this->get('/people')->assertRedirect('/login');
     }
+
+    public function test_bulk_identity_updates_only_the_ticked_fields(): void
+    {
+        $a = Person::factory()->create(['farm' => 'PFC', 'department' => 'Poultry']);
+        $b = Person::factory()->create(['farm' => 'PFC', 'department' => 'Poultry']);
+
+        $this->actingAs($this->admin())->post('/people/bulk-identity', [
+            'user_ids' => [$a->user_id, $b->user_id],
+            'apply_farm' => '1',
+            'farm' => 'BFC',
+            // apply_department omitted — department must stay untouched
+        ])->assertRedirect('/people');
+
+        $this->assertSame('BFC', $a->fresh()->farm);
+        $this->assertSame('Poultry', $a->fresh()->department);
+        $this->assertSame('BFC', $b->fresh()->farm);
+        $this->assertSame(1, AuditEntry::where('action', 'person.bulk_identity_updated')->count());
+    }
+
+    public function test_bulk_identity_can_clear_a_field(): void
+    {
+        $a = Person::factory()->create(['department' => 'Poultry']);
+
+        $this->actingAs($this->admin())->post('/people/bulk-identity', [
+            'user_ids' => [$a->user_id],
+            'apply_department' => '1',
+            'department' => '',
+        ])->assertRedirect('/people');
+
+        $this->assertNull($a->fresh()->department);
+    }
+
+    public function test_bulk_identity_requires_at_least_one_field_ticked(): void
+    {
+        $a = Person::factory()->create(['farm' => 'PFC']);
+
+        $this->actingAs($this->admin())->post('/people/bulk-identity', [
+            'user_ids' => [$a->user_id],
+        ])->assertSessionHasErrors('farm');
+
+        $this->assertSame('PFC', $a->fresh()->farm);
+    }
 }

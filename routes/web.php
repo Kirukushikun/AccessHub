@@ -35,6 +35,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/people/add', [PeopleController::class, 'create'])->name('people.create');
     Route::post('/people', [PeopleController::class, 'store'])->name('people.store');
     Route::post('/people/bulk-scope', [PeopleController::class, 'bulkScope'])->name('people.bulk-scope');
+    Route::post('/people/bulk-identity', [PeopleController::class, 'bulkIdentity'])->name('people.bulk-identity');
     Route::get('/people/{person}/edit', [PeopleController::class, 'edit'])->name('people.edit');
     Route::put('/people/{person}', [PeopleController::class, 'update'])->name('people.update');
 

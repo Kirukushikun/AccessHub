@@ -209,6 +209,49 @@ class PeopleController extends Controller
             ->with('success', "{$people->count()} people pointed at {$project->name}.");
     }
 
+    public function bulkIdentity(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'user_ids' => ['required', 'array', 'min:1'],
+            'user_ids.*' => ['integer'],
+            'apply_farm' => ['nullable', 'boolean'],
+            'farm' => ['nullable', 'string', Rule::in(AccessHub::farms()->all())],
+            'apply_department' => ['nullable', 'boolean'],
+            'department' => ['nullable', 'string', Rule::in(AccessHub::departments()->all())],
+        ]);
+
+        $applyFarm = $request->boolean('apply_farm');
+        $applyDepartment = $request->boolean('apply_department');
+
+        if (! $applyFarm && ! $applyDepartment) {
+            return back()->withErrors(['farm' => 'Tick Farm and/or Department to say what to change.']);
+        }
+
+        $updates = [];
+        if ($applyFarm) {
+            $updates['farm'] = $data['farm'] ?? null;
+        }
+        if ($applyDepartment) {
+            $updates['department'] = $data['department'] ?? null;
+        }
+
+        $people = Person::whereIn('user_id', $data['user_ids'])->get();
+        Person::whereIn('user_id', $data['user_ids'])->update($updates);
+
+        $summary = collect($updates)
+            ->map(fn ($value, $field) => ucfirst($field).' → '.($value ?? '(cleared)'))
+            ->implode(', ');
+
+        Audit::record(
+            'person.bulk_identity_updated',
+            "{$people->count()} people: {$summary}",
+            meta: ['user_ids' => $people->pluck('user_id')->all(), 'updates' => $updates],
+        );
+
+        return redirect()->route('people.index')
+            ->with('success', "{$people->count()} people updated: {$summary}.");
+    }
+
     private function auditChanges(Person $person, array $before): void
     {
         $rolesBefore = $before['roles'] ?? [];
