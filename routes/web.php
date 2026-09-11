@@ -5,6 +5,7 @@ use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ConnectionController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\GuideController;
 use App\Http\Controllers\PeopleController;
 use App\Http\Controllers\ProjectController;
 use Illuminate\Support\Facades\Route;
@@ -64,4 +65,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     // Current admin's own password
     Route::get('/account', [AdminController::class, 'account'])->name('account.edit');
     Route::put('/account/password', [AdminController::class, 'updatePassword'])->name('account.password');
+
+    // Integration guide — how to connect a new project
+    Route::get('/guide', GuideController::class)->name('guide.index');
 });

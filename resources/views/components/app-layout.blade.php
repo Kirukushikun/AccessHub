@@ -32,6 +32,9 @@
             <x-nav-link :href="route('connections.index')" :active="request()->routeIs('connections.*')">Connections</x-nav-link>
             <x-nav-link :href="route('audit.index')" :active="request()->routeIs('audit.*')">Audit log</x-nav-link>
             <x-nav-link :href="route('admins.index')" :active="request()->routeIs('admins.*')">Admins</x-nav-link>
+
+            <p class="mt-3 mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-gray-400">Help</p>
+            <x-nav-link :href="route('guide.index')" :active="request()->routeIs('guide.*')">Connecting a project</x-nav-link>
         </nav>
 
         <div class="absolute inset-x-0 bottom-0 border-t border-gray-200 p-3">
