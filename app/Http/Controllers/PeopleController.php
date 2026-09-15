@@ -152,8 +152,8 @@ class PeopleController extends Controller
             'scope' => ['required', Rule::in(array_keys(AccessHub::scopes()))],
             'projects' => ['array'],
             'projects.*' => [Rule::exists('projects', 'key')],
-            'farm' => ['nullable', 'string', 'max:255'],
-            'department' => ['nullable', 'string', 'max:255'],
+            'farm' => ['nullable', 'string', Rule::in(AccessHub::farms()->all())],
+            'department' => ['nullable', 'string', Rule::in(AccessHub::departments()->all())],
             'position' => ['nullable', 'string', 'max:255'],
             'active' => ['nullable', 'boolean'],
         ]);

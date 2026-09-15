@@ -12,9 +12,14 @@ class EnrollEndpointTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function codeFor(Project $project, string $code = 'HUB-TEST-CODE', ?\DateTimeInterface $expires = null): void
-    {
+    private function codeFor(
+        Project $project,
+        string $code = 'HUB-TEST-CODE',
+        string $environment = 'local',
+        ?\DateTimeInterface $expires = null,
+    ): void {
         $project->codes()->create([
+            'environment' => $environment,
             'code_hash' => Hash::make($code),
             'expires_at' => $expires ?? now()->addMinutes(15),
         ]);
@@ -71,6 +76,34 @@ class EnrollEndpointTest extends TestCase
         ])->assertStatus(422);
     }
 
+    public function test_code_is_scoped_to_its_environment(): void
+    {
+        $project = Project::factory()->create(['key' => 'hrms']);
+        $this->codeFor($project, environment: 'staging');
+
+        $response = $this->postJson('/api/v1/enroll', [
+            'code' => 'HUB-TEST-CODE', 'project_key' => 'hrms', 'environment' => 'production',
+        ]);
+
+        $response->assertStatus(422)->assertJsonFragment(['message' => 'This code was generated for "staging", not "production".']);
+        $this->assertSame(0, Connection::count());
+    }
+
+    public function test_an_environment_mismatch_does_not_burn_the_code(): void
+    {
+        $project = Project::factory()->create(['key' => 'hrms']);
+        $this->codeFor($project, environment: 'staging');
+
+        $this->postJson('/api/v1/enroll', [
+            'code' => 'HUB-TEST-CODE', 'project_key' => 'hrms', 'environment' => 'production',
+        ])->assertStatus(422);
+
+        // retry with the correct environment — same code still works
+        $this->postJson('/api/v1/enroll', [
+            'code' => 'HUB-TEST-CODE', 'project_key' => 'hrms', 'environment' => 'staging',
+        ])->assertOk();
+    }
+
     public function test_unknown_project_is_404(): void
     {
         $this->postJson('/api/v1/enroll', [
@@ -82,7 +115,7 @@ class EnrollEndpointTest extends TestCase
     {
         $project = Project::factory()->create(['key' => 'hrms']);
         $old = Connection::factory()->for($project)->revoked()->create(['environment' => 'production']);
-        $this->codeFor($project);
+        $this->codeFor($project, environment: 'production');
 
         $response = $this->postJson('/api/v1/enroll', [
             'code' => 'HUB-TEST-CODE', 'project_key' => 'hrms', 'environment' => 'production',

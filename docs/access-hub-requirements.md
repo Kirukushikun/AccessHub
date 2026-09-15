@@ -146,7 +146,7 @@ The goal is that a project admin never has to carry a secret between environment
 - Single use. Burned on first successful exchange.
 - Short lifetime — 15 minutes.
 - High entropy, unguessable.
-- Scoped to one project.
+- Scoped to one project **and one environment** — generated per row on the project page, only redeems for that environment.
 - The enroll endpoint is rate limited and logs the source IP.
 - The secret is returned once and stored hashed. Rotation means issuing a new one, not looking the old one up.
 
@@ -326,7 +326,7 @@ Build the **project side first** against a hand-written fake response (see the i
 - [x] Person management with fixed role list (multi-select — a person can hold more than one) and `scope` setting
 - [x] Farm, department, position fields — nullable, maintained in the hub (lists in `config/access-hub.php`)
 - [x] Filter the people list by farm / department / role, with bulk scope actions on the result
-- [x] Connection code generation — single use, 15 min, per project
+- [x] Connection code generation — single use, 15 min, per project **and per environment**
 - [x] `POST /api/v1/enroll` — rate limited (10/min), logs IP, returns secret once — see `docs/api.md`
 - [x] `GET /api/v1/grants` — client auth (`X-Client-Id` / `X-Client-Secret`), returns inactive people too, stamps `last_seen_at`
 - [x] Connections screen — grouped by project and environment, revoke and regenerate

@@ -102,6 +102,21 @@ class PeopleTest extends TestCase
         $this->assertSame(1, AuditEntry::where('action', 'person.roles_changed')->count());
     }
 
+    public function test_editing_a_person_rejects_a_farm_or_department_outside_the_fixed_lists(): void
+    {
+        $person = Person::factory()->roles('user')->create(['farm' => 'BFC', 'department' => 'Accounting']);
+
+        $this->actingAs($this->admin())->put("/people/{$person->user_id}", [
+            'roles' => ['user'],
+            'scope' => 'all',
+            'farm' => 'Not A Real Farm',
+            'department' => 'Not A Real Department',
+        ])->assertSessionHasErrors(['farm', 'department']);
+
+        $this->assertSame('BFC', $person->fresh()->farm);
+        $this->assertSame('Accounting', $person->fresh()->department);
+    }
+
     public function test_bulk_scope_points_people_at_a_project_and_flips_scope(): void
     {
         $project = Project::factory()->create(['key' => 'hrms']);

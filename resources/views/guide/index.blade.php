@@ -20,7 +20,7 @@
             </li>
             <li class="flex gap-3">
                 <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-gray-900 text-xs font-semibold text-white">2</span>
-                <span>Open that project's page → <strong>Generate connection code</strong>. One-time, expires in 15 minutes.</span>
+                <span>Open that project's page → click <strong>Generate code</strong> on the row for the environment you're enrolling (local / staging / production each have their own). One-time, expires in 15 minutes, and only works for that environment.</span>
             </li>
             <li class="flex gap-3">
                 <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-gray-900 text-xs font-semibold text-white">3</span>

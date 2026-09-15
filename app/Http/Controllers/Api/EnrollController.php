@@ -49,6 +49,24 @@ class EnrollController extends Controller
             return response()->json(['message' => 'Invalid or expired code.'], 422);
         }
 
+        // Codes are minted for one specific environment (per §6 of the
+        // requirements — staging must never accidentally pull a production
+        // code, or vice versa). A hash match alone isn't enough; the caller's
+        // stated environment must match what the code was actually issued for.
+        // Not burned on mismatch — a wrong dropdown pick shouldn't waste the code.
+        if ($code->environment !== $data['environment']) {
+            Log::warning('Enroll rejected: environment mismatch', [
+                'project' => $project->key,
+                'code_environment' => $code->environment,
+                'requested_environment' => $data['environment'],
+                'ip' => $request->ip(),
+            ]);
+
+            return response()->json([
+                'message' => "This code was generated for \"{$code->environment}\", not \"{$data['environment']}\".",
+            ], 422);
+        }
+
         $code->burn();
 
         $clientId = 'chub_'.Str::lower(Str::random(24));

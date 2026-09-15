@@ -153,6 +153,13 @@ The first time an admin clicks "Sync from hub" and no connection exists:
 
 After that, the modal never appears again. A redeploy that keeps the database keeps the connection.
 
+**A code only works for the environment it was generated for.** The hub admin picks the
+environment per code (each of local/staging/production gets its own), so if your `environment`
+doesn't match what the admin actually generated, the enroll call fails with a `422` naming
+the code's real environment — show that message verbatim rather than a generic "invalid code"
+(it tells the admin exactly what to check). The code isn't consumed by this failure, so the
+same modal submission can just be retried with the corrected environment.
+
 Also provide a **"reset connection"** action in the panel, so a bad or revoked connection is fixable from the UI instead of a database edit.
 
 ### 4.5 The preview

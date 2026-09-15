@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ConnectionCode extends Model
 {
-    protected $fillable = ['project_id', 'code_hash', 'expires_at', 'used_at', 'created_by'];
+    protected $fillable = ['project_id', 'environment', 'code_hash', 'expires_at', 'used_at', 'created_by'];
 
     protected $hidden = ['code_hash'];
 

@@ -32,8 +32,15 @@ for permanent client credentials.
 The secret is shown **once**. Store both in the project's own database (not `.env`).
 Re-enrolling the same environment replaces the secret and clears any prior revocation.
 
-**Errors:** `422` invalid / expired / wrong-project code, `404` unknown or inactive project,
-`429` rate limited.
+**A code is minted for one specific environment and only works for that one.** The hub
+admin picks the environment when generating the code (each row on the project's page —
+local / staging / production — generates its own); the `environment` you send here must
+match. Sending the right code with the wrong `environment` value is rejected with a
+`422` naming the code's actual environment — the code is **not** burned by that, so a
+wrong guess doesn't cost you the code, just retry with the correct value.
+
+**Errors:** `422` invalid / expired / wrong-project / wrong-environment code, `404` unknown
+or inactive project, `429` rate limited.
 
 ---
 

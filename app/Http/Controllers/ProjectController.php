@@ -89,26 +89,32 @@ class ProjectController extends Controller
         return redirect()->route('projects.show', $project)->with('success', 'Project updated.');
     }
 
-    public function generateCode(Project $project): RedirectResponse
+    public function generateCode(Request $request, Project $project): RedirectResponse
     {
+        $data = $request->validate([
+            'environment' => ['required', Rule::in(AccessHub::environments())],
+        ]);
+
         // HUB-XXXX-XXXX, Crockford-ish alphabet (no I/L/O/U), high entropy.
         $alphabet = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
         $chunk = fn () => collect(range(1, 4))->map(fn () => $alphabet[random_int(0, 30)])->implode('');
         $code = 'HUB-'.$chunk().'-'.$chunk();
 
         $project->codes()->create([
+            'environment' => $data['environment'],
             'code_hash' => Hash::make($code),
             'expires_at' => now()->addMinutes(AccessHub::codeTtlMinutes()),
             'created_by' => auth()->id(),
         ]);
 
-        Audit::record('connection.code_issued', "{$project->name}", $project, [
+        Audit::record('connection.code_issued', "{$project->name} · {$data['environment']}", $project, [
+            'environment' => $data['environment'],
             'expires_in_minutes' => AccessHub::codeTtlMinutes(),
         ]);
 
         return back()->with([
-            'success' => 'Connection code generated. It is shown once and expires in '
-                .AccessHub::codeTtlMinutes().' minutes.',
+            'success' => "Connection code generated for {$data['environment']}. It is shown once and expires in "
+                .AccessHub::codeTtlMinutes().' minutes. It only enrolls that environment.',
             'connection_code' => $code,
         ]);
     }

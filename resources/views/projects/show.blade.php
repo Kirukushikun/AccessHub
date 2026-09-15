@@ -5,10 +5,6 @@
         </x-slot:subtitle>
         <x-slot:actions>
             <x-button variant="secondary" :href="route('projects.edit', $project->key)">Edit</x-button>
-            <form method="POST" action="{{ route('projects.connection-code', $project->key) }}">
-                @csrf
-                <x-button type="submit">Generate connection code</x-button>
-            </form>
         </x-slot:actions>
     </x-page-header>
 
@@ -27,6 +23,7 @@
     {{-- Connections per environment --}}
     <div class="mt-6">
         <h2 class="mb-2 text-sm font-semibold text-gray-900">Connections</h2>
+        <p class="mb-2 text-xs text-gray-400">Each environment enrolls with its own code — a code generated for one only ever works for that one.</p>
         <x-table :head="['Environment', 'Client ID', 'Last seen', 'Status', '']">
             @foreach ($environments as $env)
                 @php $conn = $connections->firstWhere('environment', $env); @endphp
@@ -50,6 +47,12 @@
                         <td class="px-4 py-3 text-right">
                             @unless ($conn->revoked_at)
                                 <a href="{{ route('connections.index') }}" class="text-sm text-gray-500 hover:text-gray-800">Manage</a>
+                            @else
+                                <form method="POST" action="{{ route('projects.connection-code', $project->key) }}">
+                                    @csrf
+                                    <input type="hidden" name="environment" value="{{ $env }}">
+                                    <button class="text-sm font-medium text-gray-700 hover:underline">Generate code</button>
+                                </form>
                             @endunless
                         </td>
                     @else
@@ -57,6 +60,7 @@
                         <td class="px-4 py-3 text-right">
                             <form method="POST" action="{{ route('projects.connection-code', $project->key) }}">
                                 @csrf
+                                <input type="hidden" name="environment" value="{{ $env }}">
                                 <button class="text-sm font-medium text-gray-700 hover:underline">Generate code</button>
                             </form>
                         </td>
