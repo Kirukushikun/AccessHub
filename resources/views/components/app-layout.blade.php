@@ -7,6 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ? $title.' · ' : '' }}{{ config('app.name', 'Access Hub') }}</title>
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('favicon.png') }}">
     @fonts
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -21,8 +23,8 @@
         :class="nav && '!translate-x-0'"
     >
         <div class="flex h-14 items-center gap-2 border-b border-gray-200 px-5">
-            <span class="grid h-7 w-7 place-items-center rounded-md bg-gray-900 text-xs font-bold text-white">AH</span>
-            <span class="font-semibold">Access Hub</span>
+            <img src="{{ asset('BGC.png') }}" alt="Brookside Group of Companies" class="h-8 w-auto">
+            <span class="font-semibold text-gray-900">Access Hub</span>
         </div>
 
         <nav class="flex flex-col gap-0.5 p-3">
@@ -62,6 +64,7 @@
                     <path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/>
                 </svg>
             </button>
+            <img src="{{ asset('BGC.png') }}" alt="Brookside Group of Companies" class="h-6 w-auto">
             <span class="font-semibold">Access Hub</span>
         </header>
 
